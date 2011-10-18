@@ -21,10 +21,6 @@
 # will only record the current list of branches for future reference.
 # Thereafter, it will update the saved list of branches each time it is
 # evaluated.
-#
-# When this trigger fires, it will notify the project with
-# @:branch_list_changed@.  Otherwise, it will notify the project with
-# @:branch_list_unchanged@.
 class GitBranchTrigger
   def initialize(project, git_url)
     @project = project
@@ -52,10 +48,9 @@ class GitBranchTrigger
 
     # Trigger the build only if there is a change in the branch list.
     if old_branch_list.nil? || old_branch_list == new_branch_list
-      @project.notify :branch_list_unchanged
+      reasons << "List of branches at #{@git_url} changed"
       false
     else
-      @project.notify :branch_list_changed
       true
     end
   end

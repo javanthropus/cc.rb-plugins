@@ -8,10 +8,6 @@
 #   project.triggered_by PeriodicTrigger.new(project, 5.minutes)
 #   ...
 # end</code></pre>
-#
-# When this trigger fires, it will notify the project with
-# @:wait_period_expired@.  Otherwise, it will notify the project with
-# @:wait_period_not_expired@.
 class PeriodicTrigger
   def initialize(triggered_project, period)
     @triggered_project = triggered_project
@@ -21,10 +17,9 @@ class PeriodicTrigger
   def build_necessary?(reasons)
     last_build = @triggered_project.last_build
     if last_build && Time.now - last_build.time > @period
-      @triggered_project.notify :wait_period_expired
+      reasons << "Wait period expired"
       true
     else
-      @triggered_project.notify :wait_period_not_expired
       false
     end
   end
