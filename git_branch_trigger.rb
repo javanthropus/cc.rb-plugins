@@ -48,9 +48,9 @@ class GitBranchTrigger
 
     # Trigger the build only if there is a change in the branch list.
     if old_branch_list.nil? || old_branch_list == new_branch_list
-      reasons << "List of branches at #{@git_url} changed"
       false
     else
+      reasons << "List of branches at #{@git_url} changed"
       true
     end
   end
