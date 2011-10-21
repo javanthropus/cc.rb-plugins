@@ -38,11 +38,20 @@ class GitBranchTrigger
     end
 
     # Retrieve the current list of branches.
-    new_branch_list = IO.popen("git ls-remote --heads #{@git_url}") do |git|
+    new_branch_list = IO.popen("git ls-remote --heads #{@git_url} 2>&1") do |git|
       git.readlines
     end
+
+    # Do not trigger if there was an error retrieving the branch list.
+    unless $?.success?
+      CruiseControl::Log.event("Error querying branches in git repository `#{@git_url}':\n#{new_branch_list.join}", :error)
+      return false
+    end
+
+    # Parse out the branch names and sort the list.
     new_branch_list.map! { |l| l.chomp.split(/\s+/)[1] }
     new_branch_list.sort!
+
     # Save the list.
     File.open(branch_list_file, "w") { |f| f.puts new_branch_list }
 
